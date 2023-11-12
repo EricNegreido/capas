@@ -3,15 +3,19 @@ import local from 'passport-local';
 import usersModel from "../dao/models/users.models.js";
 import GitHubStrategy from 'passport-github2';
 import {createHash, isValidPassword} from "../utils.js";
+import config from "./config.js";
 
 const LocalStrategy = local.Strategy;
+const GIT_SECRETE = config.gitSecrete;
+const USER_ADMIN = config.userAdmin;
+const PASSW_ADMIN = config.passwordAdmin;
 
 
 const intializePassport = () => {
 
     passport.use('github', new GitHubStrategy({
         clientID: 'Iv1.6b11166cca03c44c',
-        clientSecret: '8d4ecdf027057d00357b07ac4e302678114b3109',
+        clientSecret: GIT_SECRETE,
         callbackURL:  'http://localhost:8080/api/sessions/github-callback',
         scope: ['user:email']
     }, async(accessToken, refreshToken, profile, done ) => {//lo siguente se ejecuta una vez authenticados en git hub
@@ -86,7 +90,7 @@ const intializePassport = () => {
                 
             }
            
-            const rol = (email === "adminCoder@coder.com" && password === "adminCod3r123" ) ? 'Admin' : 'User';
+            const rol = (email === USER_ADMIN && password === PASSW_ADMIN ) ? 'Admin' : 'User';
             const user = await usersModel.create({
                 first_name,
                 last_name, 

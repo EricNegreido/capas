@@ -10,14 +10,15 @@ import cartsRouter from './routes/carts.router.js';
 import productsRouter from './routes/products.router.js';
 import intializePassport from './config/passport.config.js';
 import passport from 'passport';
+import config from './config/config.js';
 
-
-
+const MONGO_URL = config.mongoUrl;
+const SESSIONS_SECRETE = config.sessionSecrete;
 
 const app = express();
 
 try {
-    await mongoose.connect('mongodb+srv://ericnegreidooo:NwhiTotw0VIjgLVp@cluster47300ap.yetvntr.mongodb.net/loginx3eros?retryWrites=true&w=majority');
+    await mongoose.connect(MONGO_URL);
     console.log('BBd connected');
 } catch (error) {
     console.log(error.message);
@@ -41,7 +42,7 @@ app.use(session({
         ttl: 60
         
     }),
-    secret: 'Coder47300Secret',
+    secret: SESSIONS_SECRETE,
     resave: true,
     saveUninitialized: true
 }));

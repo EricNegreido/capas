@@ -1,53 +1,28 @@
 import { Router } from "express";
 import passport from 'passport';
+import { authLogin, failLogin, failRegister, githubAuth, githubLogin, logout, register } from "../controllers/sessions.controller.js";
 
 
 const router = Router()
+//Login
+router.post('/login', passport.authenticate('login', {failureRedirect: 'fail-login'}), authLogin);
 
-//GIT HUB AUTH
-router.get('/github', passport.authenticate('github', {scope:['user:email']}), async(req, res) =>{
-    res.send({status: 'success', message: 'user registered'});
-});
+router.get('/logout', logout);
 
-router.get('/github-callback', passport.authenticate('github', {failureRedirect: '/login'}), async(req, res) =>{
-    req.session.user = req.user;
-    res.redirect('/');
-});
+router.get('/fail-login', failLogin); 
 
-router.post('/register', passport.authenticate('register', {failureRedirect: 'fail-register'}), async (req, res) => {
+//git
+router.get('/github', passport.authenticate('github', {scope:['user:email']}), githubAuth);
 
-    res.send({ status: 'success', message:' user registered'})
-});
+router.get('/github-callback', passport.authenticate('github', {failureRedirect: '/login'}), githubLogin);
 
- router.get('/fail-register', async (req, res) => {
-    res.status(500).send({status: 'error', message:'register fail'})
- });
- 
-router.post('/login', passport.authenticate('login', {failureRedirect: 'fail-login'}), async (req, res) => {
-    
-    if(!req.user)
-        return res.status(401).send({status: 'error', message: 'incorrect credentials'});
+//REGISTER
 
-    req.session.user = {
-        name: `${req.user.first_name} ${req.user.last_name}`,
-        email: req.user.email,
-        age: req.user.age,
-        rol: req.user.rol
-    }
-    res.send({status: 'success', message: 'login success'})
-});
+router.post('/register', passport.authenticate('register', {failureRedirect: 'fail-register'}),  register);
 
-router.get('/fail-login', async (req, res) => {
-    res.status(500).send({status: 'error', message:'login fail'})
- });
+router.get('/fail-register', failRegister); 
 
-
-router.get('/logout', (req, res) =>{
-    req.session.destroy(error => {
-        if(error) return res.status(500).send({status:'error', error});
-        res.redirect('/');
-    })
-})
 
 
 export default router;
+
